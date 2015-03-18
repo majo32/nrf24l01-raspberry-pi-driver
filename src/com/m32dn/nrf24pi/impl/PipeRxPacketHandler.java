@@ -23,27 +23,27 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 import java.util.concurrent.Callable;
 
 /**
  *
  * @author majo
  */
-class PipeRxPacketHandler implements Callable<RxPacket> {
+class PipeRxPacketHandler implements Callable<Nrf24RxPacket> {
 
     private final PipeImpl pipe;
-    private RxPacket packet;
+    private Nrf24RxPacket packet;
 
     public PipeRxPacketHandler(PipeImpl pipe) {
         this.pipe = pipe;
     }
 
-    public void setPacket(RxPacket packet) {
+    public void setPacket(Nrf24RxPacket packet) {
         this.packet = packet;
     }
     @Override
-    public RxPacket call() throws Exception {
+    public Nrf24RxPacket call() throws Exception {
         pipe.startPacketTaskWaiting();
         return packet;
     }

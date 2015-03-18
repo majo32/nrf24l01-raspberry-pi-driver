@@ -24,7 +24,7 @@
 
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Address;
+import com.m32dn.nrf24pi.Nrf24Address;
 import com.m32dn.nrf24pi.enums.AddressLengthIdentifier;
 import java.nio.ByteBuffer;
 
@@ -32,7 +32,7 @@ import java.nio.ByteBuffer;
  *
  * @author majo
  */
-public class AddressImpl implements Address{
+public class AddressImpl implements Nrf24Address{
     private byte data []; 
     
     public AddressImpl(byte ... d){
@@ -52,7 +52,7 @@ public class AddressImpl implements Address{
     }
 
     @Override
-    public boolean isEqual(Address b, AddressLengthIdentifier type) {
+    public boolean isEqual(Nrf24Address b, AddressLengthIdentifier type) {
         ByteBuffer d = b.renderByteArray(type);
         for(int i = 0;i< type.getLength(); i++){
             if(d.get(i) != data[i]){
@@ -63,7 +63,7 @@ public class AddressImpl implements Address{
     }
 
     @Override
-    public boolean isDerivated(Address b, AddressLengthIdentifier type) {
+    public boolean isDerivated(Nrf24Address b, AddressLengthIdentifier type) {
         ByteBuffer d = b.renderByteArray(type);
         for(int i = 0;i< type.getLength() - 1; i++){
             if(d.get(i) != data[i]){
@@ -79,7 +79,7 @@ public class AddressImpl implements Address{
     }
 
     @Override
-    public Address renderDerivatedAddress(AddressLengthIdentifier type, byte lastByte) {
+    public Nrf24Address renderDerivatedAddress(AddressLengthIdentifier type, byte lastByte) {
         byte [] d = new byte [type.getLength()];
         System.arraycopy(data, 0, d, 0, type.getLength() - 1);
         d[type.getLength() - 1] = lastByte;

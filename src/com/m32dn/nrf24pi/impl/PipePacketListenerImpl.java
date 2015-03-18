@@ -25,7 +25,7 @@
 package com.m32dn.nrf24pi.impl;
 
 import com.m32dn.nrf24pi.event.PacketListener;
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 
 /**
  *
@@ -39,7 +39,7 @@ class PipePacketListenerImpl implements PacketListener{
     }
    
     @Override
-    public void handlePacket(RxPacket packet) {
+    public void handlePacket(Nrf24RxPacket packet) {
         pipe.executePacketTask(packet);
     }
     

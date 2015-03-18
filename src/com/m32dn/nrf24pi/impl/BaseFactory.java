@@ -23,10 +23,10 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Connector;
+import com.m32dn.nrf24pi.Nfr24Connector;
 import com.m32dn.nrf24pi.exception.ControllerInstanceExistsException;
 import com.m32dn.nrf24pi.Nrf24Controller;
-import com.m32dn.nrf24pi.Provider;
+import com.m32dn.nrf24pi.Nrf24Provider;
 import com.m32dn.nrf24pi.enums.AddressLengthIdentifier;
 import com.m32dn.nrf24pi.enums.PipeName;
 import com.m32dn.nrf24pi.exception.NrfIOException;
@@ -70,8 +70,8 @@ abstract public class BaseFactory {
         if (controller != null) {
             throw new ControllerInstanceExistsException();
         }
-        Connector c = new ConnectorImpl((Pin) getConfigAttr("csn_pin", customConfig), (Pin) getConfigAttr("ce_pin", customConfig), (Pin) getConfigAttr("irq_pin", customConfig));
-        Provider p = new ProviderImpl(c);
+        Nfr24Connector c = new ConnectorImpl((Pin) getConfigAttr("csn_pin", customConfig), (Pin) getConfigAttr("ce_pin", customConfig), (Pin) getConfigAttr("irq_pin", customConfig));
+        Nrf24Provider p = new ProviderImpl(c);
         if ((boolean) getConfigAttr("auto_acknowlegement", customConfig)) {
             p.setAutoAcknowledgement(PipeName.PAA, true);
             p.useRxPipe(PipeName.PAA, true);

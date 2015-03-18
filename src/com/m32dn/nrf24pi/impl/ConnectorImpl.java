@@ -27,7 +27,7 @@ import com.m32dn.nrf24pi.nrfbyte.ByteBuilder;
 import com.m32dn.nrf24pi.nrfbyte.CommandByte;
 import com.m32dn.nrf24pi.nrfbyte.MessageByte;
 import com.m32dn.nrf24pi.nrfbyte.RegisterByte;
-import com.m32dn.nrf24pi.Connector;
+import com.m32dn.nrf24pi.Nfr24Connector;
 import com.m32dn.nrf24pi.event.IrqListener;
 import com.m32dn.nrf24pi.exception.NrfIOException;
 import com.pi4j.io.gpio.GpioController;
@@ -46,7 +46,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectorImpl implements Connector {
+public class ConnectorImpl implements Nfr24Connector {
 
     private final GpioController gpio = GpioFactory.getInstance();
     private GpioPinDigitalOutput CEpin;

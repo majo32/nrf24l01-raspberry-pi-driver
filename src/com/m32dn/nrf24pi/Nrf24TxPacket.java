@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  *
  * @author majo
  */
-public interface TxPacket {
-    public Address getTXAddress();
+public interface Nrf24TxPacket {
+    public Nrf24Address getTXAddress();
     public ByteBuffer getPayload();
 }

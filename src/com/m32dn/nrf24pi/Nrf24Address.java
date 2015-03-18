@@ -13,10 +13,10 @@ import java.nio.ByteBuffer;
  *
  * @author majo
  */
-public interface Address {
+public interface Nrf24Address {
     public ByteBuffer renderByteArray(AddressLengthIdentifier type);
-    public boolean isEqual(Address b,AddressLengthIdentifier type);
-    public boolean isDerivated(Address b,AddressLengthIdentifier type);
+    public boolean isEqual(Nrf24Address b,AddressLengthIdentifier type);
+    public boolean isDerivated(Nrf24Address b,AddressLengthIdentifier type);
     public byte getLastByte(AddressLengthIdentifier type);
-    public Address renderDerivatedAddress(AddressLengthIdentifier type,byte lastByte);
+    public Nrf24Address renderDerivatedAddress(AddressLengthIdentifier type,byte lastByte);
 }

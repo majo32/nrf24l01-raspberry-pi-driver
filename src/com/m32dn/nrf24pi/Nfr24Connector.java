@@ -35,7 +35,7 @@ import java.nio.ByteBuffer;
  *
  * @author majo
  */
-public interface Connector {
+public interface Nfr24Connector {
     /**
      * Write command and than write toWrite bytes to chip in one transaction;
      * @param command

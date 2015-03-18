@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
  *
  * @author majo
  */
-public interface RxPacket {
-    public Pipe getPipe();
+public interface Nrf24RxPacket {
+    public Nrf24Pipe getPipe();
     public ByteBuffer getPayload();
 }

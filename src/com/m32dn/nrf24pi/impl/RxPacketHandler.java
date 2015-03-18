@@ -24,16 +24,16 @@
 package com.m32dn.nrf24pi.impl;
 
 import com.m32dn.nrf24pi.response.Status;
-import com.m32dn.nrf24pi.Pipe;
+import com.m32dn.nrf24pi.Nrf24Pipe;
 import com.m32dn.nrf24pi.enums.PipeName;
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 import java.util.concurrent.Callable;
 
 /**
  *
  * @author majo
  */
-class RxPacketHandler implements Callable<RxPacket> {
+class RxPacketHandler implements Callable<Nrf24RxPacket> {
 
     private Status status;
     private final ControllerImpl controller;
@@ -47,10 +47,10 @@ class RxPacketHandler implements Callable<RxPacket> {
     }
 
     @Override
-    public RxPacket call() throws Exception {
+    public Nrf24RxPacket call() throws Exception {
         PipeName p = PipeName.getByName(status.getPipeNumber());
-        Pipe pipe = controller.getPipe(p);
-        RxPacket packet = new RxPacketImpl(pipe,controller.getProvider().read(pipe.getPayloadWidth()));
+        Nrf24Pipe pipe = controller.getPipe(p);
+        Nrf24RxPacket packet = new RxPacketImpl(pipe,controller.getProvider().read(pipe.getPayloadWidth()));
         controller.setLastPacket(packet);
         controller.handlePacketFromPipe(pipe, packet);
         controller.startPacketWaiting();

@@ -23,12 +23,12 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Address;
+import com.m32dn.nrf24pi.Nrf24Address;
 import com.m32dn.nrf24pi.Nrf24Controller;
 import com.m32dn.nrf24pi.event.PacketListener;
-import com.m32dn.nrf24pi.Pipe;
+import com.m32dn.nrf24pi.Nrf24Pipe;
 import com.m32dn.nrf24pi.enums.PipeName;
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 import com.m32dn.nrf24pi.exception.NrfIOException;
 import com.m32dn.nrf24pi.exception.NrfPipeNotOpenException;
 import java.util.concurrent.Future;
@@ -38,17 +38,17 @@ import java.util.concurrent.FutureTask;
  *
  * @author majo
  */
-public class PipeImpl implements Pipe {
+public class PipeImpl implements Nrf24Pipe {
 
     private final PipeName name;
     private final int payloadWidth;
     private final ControllerImpl controller;
 
     private final PipeRxPacketHandler packetHandler;
-    private FutureTask<RxPacket> packetTask;
-    private final Address address;
+    private FutureTask<Nrf24RxPacket> packetTask;
+    private final Nrf24Address address;
 
-    public PipeImpl(ControllerImpl controller, PipeName name, Address address, int payloadWidth) {
+    public PipeImpl(ControllerImpl controller, PipeName name, Nrf24Address address, int payloadWidth) {
         this.payloadWidth = payloadWidth;
         this.controller = controller;
         this.name = name;
@@ -62,7 +62,7 @@ public class PipeImpl implements Pipe {
         packetTask = new FutureTask(packetHandler);
     }
 
-    protected void executePacketTask(RxPacket packet) {
+    protected void executePacketTask(Nrf24RxPacket packet) {
         if (packetTask != null) {
             packetHandler.setPacket(packet);
             controller.getExecutor().execute(packetTask);
@@ -75,18 +75,18 @@ public class PipeImpl implements Pipe {
     }
 
     @Override
-    public Future<RxPacket> getWaitingForPacketFuture() {
+    public Future<Nrf24RxPacket> getWaitingForPacketFuture() {
         return packetTask;
     }
 
     @Override
-    public Pipe addPacketListener(PacketListener listener) {
+    public Nrf24Pipe addPacketListener(PacketListener listener) {
         controller.addPacketListener(name, listener);
         return this;
     }
 
     @Override
-    public Pipe close() throws NrfIOException, NrfPipeNotOpenException {
+    public Nrf24Pipe close() throws NrfIOException, NrfPipeNotOpenException {
         controller.closePipe(name);
         return this;
     }
@@ -102,7 +102,7 @@ public class PipeImpl implements Pipe {
     }
 
     @Override
-    public Address getAddress() {
+    public Nrf24Address getAddress() {
         return address;
     }
 

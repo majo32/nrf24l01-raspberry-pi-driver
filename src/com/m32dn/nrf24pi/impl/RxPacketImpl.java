@@ -23,26 +23,26 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Pipe;
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24Pipe;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 import java.nio.ByteBuffer;
 
 /**
  *
  * @author majo
  */
-public class RxPacketImpl implements RxPacket {
+public class RxPacketImpl implements Nrf24RxPacket {
 
-    private final Pipe pipe;
+    private final Nrf24Pipe pipe;
     private final ByteBuffer payload;
 
-    public RxPacketImpl(Pipe pipe, ByteBuffer payload) {
+    public RxPacketImpl(Nrf24Pipe pipe, ByteBuffer payload) {
         this.pipe = pipe;
         this.payload = payload;
     }
 
     @Override
-    public Pipe getPipe() {
+    public Nrf24Pipe getPipe() {
         return pipe;
     }
 

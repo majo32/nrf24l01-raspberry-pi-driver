@@ -24,12 +24,12 @@
 package com.m32dn.nrf24pi.impl;
 
 import com.m32dn.nrf24pi.response.Status;
-import com.m32dn.nrf24pi.Address;
+import com.m32dn.nrf24pi.Nrf24Address;
 import com.m32dn.nrf24pi.Nrf24Controller;
-import com.m32dn.nrf24pi.Pipe;
-import com.m32dn.nrf24pi.Provider;
-import com.m32dn.nrf24pi.RxPacket;
-import com.m32dn.nrf24pi.TxPacket;
+import com.m32dn.nrf24pi.Nrf24Pipe;
+import com.m32dn.nrf24pi.Nrf24Provider;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
+import com.m32dn.nrf24pi.Nrf24TxPacket;
 import com.m32dn.nrf24pi.enums.AckState;
 import com.m32dn.nrf24pi.enums.AddressLengthIdentifier;
 import com.m32dn.nrf24pi.enums.PipeName;
@@ -59,24 +59,24 @@ public class ControllerImpl implements Nrf24Controller {
     private final RxPacketHandler nextRxPacketProcess;
     private final AckStateHandler confirmAckProcess;
 
-    private FutureTask<RxPacket> nextRxPacketFuture;
+    private FutureTask<Nrf24RxPacket> nextRxPacketFuture;
     private FutureTask<AckState> confirmAckFuture;
 
     private final ExecutorService executor;
-    private final Provider provider;
+    private final Nrf24Provider provider;
 
     private final List<Entry<PipeName, PacketListener>> packetListeners;
-    private RxPacket lastPacket;
+    private Nrf24RxPacket lastPacket;
     private final List<AckListener> ackListeners;
     private AckState lastAckState;
 
-    private Address currentTxAddress;
+    private Nrf24Address currentTxAddress;
     private AddressLengthIdentifier addressLength;
-    private final List<Pipe> openPipes;
+    private final List<Nrf24Pipe> openPipes;
     private boolean autoAck = false;
     private boolean isRxMode = false;
 
-    public ControllerImpl(Provider provider) {
+    public ControllerImpl(Nrf24Provider provider) {
         this.provider = provider;
         nextRxPacketProcess = new RxPacketHandler(this);
         confirmAckProcess = new AckStateHandler(this);
@@ -140,7 +140,7 @@ public class ControllerImpl implements Nrf24Controller {
         return ackListeners;
     }
 
-    protected void handlePacketFromPipe(Pipe pipe, RxPacket packet) {
+    protected void handlePacketFromPipe(Nrf24Pipe pipe, Nrf24RxPacket packet) {
         for (Entry<PipeName, PacketListener> entry : getPacketListeners()) {
             if (entry.getKey() == pipe.getPipeName()) {
                 entry.getValue().handlePacket(packet);
@@ -154,7 +154,7 @@ public class ControllerImpl implements Nrf24Controller {
         }
     }
 
-    protected void setLastPacket(RxPacket packet) {
+    protected void setLastPacket(Nrf24RxPacket packet) {
         lastPacket = packet;
     }
 
@@ -170,11 +170,11 @@ public class ControllerImpl implements Nrf24Controller {
         return executor;
     }
 
-    public RxPacket getLastPacket() {
+    public Nrf24RxPacket getLastPacket() {
         return lastPacket;
     }
 
-    protected Provider getProvider() {
+    protected Nrf24Provider getProvider() {
         return provider;
     }
 
@@ -202,7 +202,7 @@ public class ControllerImpl implements Nrf24Controller {
     }
 
     @Override
-    public AckState sendSynchronized(TxPacket packet) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException {
+    public AckState sendSynchronized(Nrf24TxPacket packet) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException {
         Future<AckState> f = send(packet);
         AckState ack = null;
         try {
@@ -219,12 +219,12 @@ public class ControllerImpl implements Nrf24Controller {
     }
 
     @Override
-    public AckState sendSynchronized(Address address, ByteBuffer payload) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException {
+    public AckState sendSynchronized(Nrf24Address address, ByteBuffer payload) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException {
         return sendSynchronized(new TxPacketImpl(address, payload));
     }
 
     @Override
-    public Future<AckState> send(TxPacket packet) throws NrfIOException {
+    public Future<AckState> send(Nrf24TxPacket packet) throws NrfIOException {
         if (currentTxAddress == null || !packet.getTXAddress().isEqual(currentTxAddress, addressLength)) {
             provider.setTxAddress(packet.getTXAddress());
             currentTxAddress = packet.getTXAddress();
@@ -238,12 +238,12 @@ public class ControllerImpl implements Nrf24Controller {
     }
 
     @Override
-    public Future<AckState> send(Address address, ByteBuffer payload) throws NrfIOException {
+    public Future<AckState> send(Nrf24Address address, ByteBuffer payload) throws NrfIOException {
         return send(new TxPacketImpl(address, payload));
     }
 
     @Override
-    public Pipe openPipe(PipeName name, Address address, int payload_width) throws NrfIOException, NrfOpenPipeException {
+    public Nrf24Pipe openPipe(PipeName name, Nrf24Address address, int payload_width) throws NrfIOException, NrfOpenPipeException {
         if (autoAck) {
             if (name == PipeName.PAA) {
                 throw new NrfOpenPipeException("Can not open \'Pipe 0\' while auto acknowlegenemt is on!");
@@ -254,7 +254,7 @@ public class ControllerImpl implements Nrf24Controller {
         provider.useRxPipe(name, true);
         if (name.getRXAddressWidth() != 5) {
             try {
-                Pipe p1 = getPipe(PipeName.P1);
+                Nrf24Pipe p1 = getPipe(PipeName.P1);
                 if (!address.isDerivated(p1.getAddress(), addressLength)) {
                     throw new NrfOpenPipeException("Address of \'Pipe 2 .. 5\' must have first n-1 bytes the same with \'Pipe 1\'!");
                 }
@@ -267,14 +267,14 @@ public class ControllerImpl implements Nrf24Controller {
             provider.setRxAddress(name, address);
         }
         provider.pushConfiguration();
-        Pipe p = new PipeImpl(this, name, address, payload_width);
+        Nrf24Pipe p = new PipeImpl(this, name, address, payload_width);
         openPipes.add(p);
         return p;
     }
 
     @Override
-    public Pipe getPipe(PipeName name) throws NrfPipeNotOpenException {
-        for (Pipe p : openPipes) {
+    public Nrf24Pipe getPipe(PipeName name) throws NrfPipeNotOpenException {
+        for (Nrf24Pipe p : openPipes) {
             if (p.getPipeName() == name) {
                 return p;
             }
@@ -285,7 +285,7 @@ public class ControllerImpl implements Nrf24Controller {
     @Override
     public Nrf24Controller closePipe(PipeName name) throws NrfIOException, NrfPipeNotOpenException {
         provider.useRxPipe(name, true);
-        Pipe p = getPipe(name);
+        Nrf24Pipe p = getPipe(name);
         openPipes.remove(p);
         provider.pushConfiguration();
         return this;

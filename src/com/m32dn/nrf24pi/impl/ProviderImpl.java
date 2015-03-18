@@ -23,13 +23,13 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Address;
+import com.m32dn.nrf24pi.Nrf24Address;
 import com.m32dn.nrf24pi.enums.AddressLengthIdentifier;
 import com.m32dn.nrf24pi.enums.CommandsMap;
 import com.m32dn.nrf24pi.enums.PipeName;
 import com.m32dn.nrf24pi.response.Status;
-import com.m32dn.nrf24pi.Connector;
-import com.m32dn.nrf24pi.Provider;
+import com.m32dn.nrf24pi.Nfr24Connector;
+import com.m32dn.nrf24pi.Nrf24Provider;
 import com.m32dn.nrf24pi.exception.NrfIOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -40,15 +40,15 @@ import java.util.Map.Entry;
  *
  * @author majo
  */
-public class ProviderImpl implements Provider {
+public class ProviderImpl implements Nrf24Provider {
 
-    private final Connector connector;
+    private final Nfr24Connector connector;
     private final Map<String, Byte> configMap;
     private final Map<Byte, ByteBuffer> registerQueue;
     private AddressLengthIdentifier addressLen = AddressLengthIdentifier.L5;
     private boolean ACK = false;
 
-    public ProviderImpl(Connector connector) {
+    public ProviderImpl(Nfr24Connector connector) {
         this.configMap = new HashMap();
         this.connector = connector;
         this.registerQueue = new HashMap();
@@ -56,7 +56,7 @@ public class ProviderImpl implements Provider {
 
     }
 
-    public final Provider resetConfig(){
+    public final Nrf24Provider resetConfig(){
         setConfigAttribute("LNA_gain", (byte) 1);
         setConfigAttribute("PLL_lock", (byte) 0);
         return this;
@@ -124,35 +124,35 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setChannel(byte channel) {
+    public Nrf24Provider setChannel(byte channel) {
         setConfigAttribute("channel", (byte) (channel & 0b01111111));
         enqueueChannelRegister();
         return this;
     }
 
     @Override
-    public Provider setRFOutputPower(byte outputPower) {
+    public Nrf24Provider setRFOutputPower(byte outputPower) {
         setConfigAttribute("output_power", outputPower);
         enqueueRfSetupRegister();
         return this;
     }
 
     @Override
-    public Provider setSpeedRate(byte speedRate) {
+    public Nrf24Provider setSpeedRate(byte speedRate) {
         setConfigAttribute("data_rate", speedRate);
         enqueueRfSetupRegister();
         return this;
     }
 
     @Override
-    public Provider useCRC(boolean useCRC) {
+    public Nrf24Provider useCRC(boolean useCRC) {
         setConfigAttribute("use_crc", (byte) (useCRC ? 1 : 0));
         enqueueConfigRegister();
         return this;
     }
 
     @Override
-    public Provider setCRCLen(byte CRCLen) {
+    public Nrf24Provider setCRCLen(byte CRCLen) {
         setConfigAttribute("crc_len", CRCLen);
         useCRC(true);
         enqueueConfigRegister();
@@ -160,21 +160,21 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setRetransmissionDelay(byte delay) {
+    public Nrf24Provider setRetransmissionDelay(byte delay) {
         setConfigAttribute("retransmission_delay", delay);
         enqueueSetupRetransmissionsRegister();
         return this;
     }
 
     @Override
-    public Provider setRetransmissionTrials(byte trials) {
+    public Nrf24Provider setRetransmissionTrials(byte trials) {
         setConfigAttribute("retransmission_trials", trials);
         enqueueSetupRetransmissionsRegister();
         return this;
     }
 
     @Override
-    public Provider setAddressLength(AddressLengthIdentifier al) {
+    public Nrf24Provider setAddressLength(AddressLengthIdentifier al) {
         addressLen = al;
         setConfigAttribute("address_len", al.getIdentifier());
         enqueueAddressWidthRegister();
@@ -183,7 +183,7 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setAutoAcknowledgement(PipeName pipe, boolean useAA) {
+    public Nrf24Provider setAutoAcknowledgement(PipeName pipe, boolean useAA) {
         setConfigAttribute("auto_ack_" + pipe.toString(), (byte) (useAA ? 1 : 0));
         ACK = false;
         for (PipeName p : PipeName.values()) {
@@ -202,21 +202,21 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider useRxPipe(PipeName pipe, boolean usePipe) {
+    public Nrf24Provider useRxPipe(PipeName pipe, boolean usePipe) {
         setConfigAttribute("rx_pipe_" + pipe.toString(), (byte) (usePipe ? 1 : 0));
         enqueueEnableRxAddressRegister();
         return this;
     }
 
     @Override
-    public Provider setPayloadWidth(PipeName pipe, byte len) {
+    public Nrf24Provider setPayloadWidth(PipeName pipe, byte len) {
         setConfigAttribute("payload_width_" + pipe.toString(), len);
         enqueueRegister(pipe.getRXPayloadWidthRegister(), len);
         return this;
     }
 
     @Override
-    public Provider pushConfiguration() throws NrfIOException {
+    public Nrf24Provider pushConfiguration() throws NrfIOException {
         for (Entry<Byte, ByteBuffer> entry : registerQueue.entrySet()) {
             connector.writeRegister(entry.getKey(), entry.getValue());
         }
@@ -224,15 +224,15 @@ public class ProviderImpl implements Provider {
         return this;
     }
 
-    public Provider pushRegister(Byte reg, Byte value) throws NrfIOException {
+    public Nrf24Provider pushRegister(Byte reg, Byte value) throws NrfIOException {
         connector.writeRegister(reg, value);
         return this;
     }
-    public Provider pushRegister(Byte reg, ByteBuffer value) throws NrfIOException {
+    public Nrf24Provider pushRegister(Byte reg, ByteBuffer value) throws NrfIOException {
         connector.writeRegister(reg, value);
         return this;
     }
-    public Provider pushRegister(Byte reg) throws NrfIOException {
+    public Nrf24Provider pushRegister(Byte reg) throws NrfIOException {
         if(registerQueue.get(reg) == null){
             return this;
         }
@@ -242,7 +242,7 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setTxAddress(Address address) {
+    public Nrf24Provider setTxAddress(Nrf24Address address) {
         if (ACK) {
             enqueueRegister(CommandsMap.RX_ADDR_P0, address.renderByteArray(addressLen));
         }
@@ -251,19 +251,19 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setRxAddress(PipeName pipe, Address address) {
+    public Nrf24Provider setRxAddress(PipeName pipe, Nrf24Address address) {
         enqueueRegister(pipe.getRXAddressRegister(), address.renderByteArray(addressLen));
         return this;
     }
     
     @Override
-    public Provider setRxAddressLsByte(PipeName pipe, Byte lsByte) {
+    public Nrf24Provider setRxAddressLsByte(PipeName pipe, Byte lsByte) {
         enqueueRegister(pipe.getRXAddressRegister(), lsByte);
         return this;
     }
 
     @Override
-    public Provider send(ByteBuffer packet) throws NrfIOException {
+    public Nrf24Provider send(ByteBuffer packet) throws NrfIOException {
         connector.writeCommand(CommandsMap.W_TX_PAYLOAD, packet);
         connector.fireMessageSending();
         return this;
@@ -282,30 +282,30 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider clearStatus(Status status) throws NrfIOException {
+    public Nrf24Provider clearStatus(Status status) throws NrfIOException {
         pushRegister(CommandsMap.STATUS, status.renderClearByte());
         return this;
     }
     
-    protected Provider resetStatus() throws NrfIOException {
+    protected Nrf24Provider resetStatus() throws NrfIOException {
         pushRegister(CommandsMap.STATUS, Status.renderResetByte());
         return this;
     }
 
     @Override
-    public Provider flushRxFifo() throws NrfIOException {
+    public Nrf24Provider flushRxFifo() throws NrfIOException {
         connector.syncCommand(CommandsMap.FLUSH_RX);
         return this;
     }
 
     @Override
-    public Provider flushTxFifo() throws NrfIOException {
+    public Nrf24Provider flushTxFifo() throws NrfIOException {
         connector.syncCommand(CommandsMap.FLUSH_TX);
         return this;
     }
 
     @Override
-    public Provider start() throws NrfIOException {
+    public Nrf24Provider start() throws NrfIOException {
         connector.start();
         resetStatus();
         flushRxFifo();
@@ -316,28 +316,28 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider stop() throws NrfIOException {
+    public Nrf24Provider stop() throws NrfIOException {
         setPowerOff();
         connector.stop();
         return this;
     }
 
     @Override
-    public Provider setPowerOn() throws NrfIOException{
+    public Nrf24Provider setPowerOn() throws NrfIOException{
         setConfigAttribute("pwr_up", (byte) 1);
         pushRegister(enqueueConfigRegister());
         return this;
     }
 
     @Override
-    public Provider setPowerOff() throws NrfIOException{
+    public Nrf24Provider setPowerOff() throws NrfIOException{
         setConfigAttribute("pwr_up", (byte) 0);
         pushRegister(enqueueConfigRegister());
         return this;
     }
 
     @Override
-    public Provider setRxMode() throws NrfIOException{
+    public Nrf24Provider setRxMode() throws NrfIOException{
         setConfigAttribute("type", (byte) 1);
         connector.startMonitoring();
         pushRegister(enqueueConfigRegister());
@@ -345,7 +345,7 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Provider setTxMode() throws NrfIOException{
+    public Nrf24Provider setTxMode() throws NrfIOException{
         setConfigAttribute("type", (byte) 0);
         connector.stopMonitoring();
         pushRegister(enqueueConfigRegister());
@@ -353,7 +353,7 @@ public class ProviderImpl implements Provider {
     }
 
     @Override
-    public Connector getConnector() {
+    public Nfr24Connector getConnector() {
         return connector;
     }
 

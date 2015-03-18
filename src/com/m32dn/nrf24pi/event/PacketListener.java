@@ -24,12 +24,12 @@
 
 package com.m32dn.nrf24pi.event;
 
-import com.m32dn.nrf24pi.RxPacket;
+import com.m32dn.nrf24pi.Nrf24RxPacket;
 
 /**
  *
  * @author majo
  */
 public interface PacketListener {
-     public void handlePacket(RxPacket packet);
+     public void handlePacket(Nrf24RxPacket packet);
 }

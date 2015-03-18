@@ -41,17 +41,17 @@ public interface Nrf24Controller {
 
     public Nrf24Controller start() throws NrfIOException;
 
-    public AckState sendSynchronized(TxPacket packet) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException;
+    public AckState sendSynchronized(Nrf24TxPacket packet) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException;
 
-    public AckState sendSynchronized(Address address, ByteBuffer payload) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException;
+    public AckState sendSynchronized(Nrf24Address address, ByteBuffer payload) throws NrfIOException, NrfUndeliveredMessageException, NrfMessageTimeOutException;
 
-    public Future<AckState> send(TxPacket packet) throws NrfIOException;
+    public Future<AckState> send(Nrf24TxPacket packet) throws NrfIOException;
 
-    public Future<AckState> send(Address address, ByteBuffer payload) throws NrfIOException;
+    public Future<AckState> send(Nrf24Address address, ByteBuffer payload) throws NrfIOException;
 
-    public Pipe openPipe(PipeName name, Address address, int payload_width) throws NrfIOException, NrfOpenPipeException;
+    public Nrf24Pipe openPipe(PipeName name, Nrf24Address address, int payload_width) throws NrfIOException, NrfOpenPipeException;
 
-    public Pipe getPipe(PipeName name) throws NrfPipeNotOpenException;
+    public Nrf24Pipe getPipe(PipeName name) throws NrfPipeNotOpenException;
 
     public Nrf24Controller closePipe(PipeName name) throws NrfIOException, NrfPipeNotOpenException;
 

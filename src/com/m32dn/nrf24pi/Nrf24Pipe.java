@@ -34,13 +34,13 @@ import java.util.concurrent.Future;
  *
  * @author majo
  */
-public interface Pipe {
+public interface Nrf24Pipe {
     public int getPayloadWidth();
  
-    public Future<RxPacket> getWaitingForPacketFuture();
-    public Pipe addPacketListener(PacketListener listener);
-    public Pipe close() throws NrfIOException, NrfPipeNotOpenException;
+    public Future<Nrf24RxPacket> getWaitingForPacketFuture();
+    public Nrf24Pipe addPacketListener(PacketListener listener);
+    public Nrf24Pipe close() throws NrfIOException, NrfPipeNotOpenException;
     public Nrf24Controller getController();
     public PipeName getPipeName();
-    public Address getAddress();
+    public Nrf24Address getAddress();
 }

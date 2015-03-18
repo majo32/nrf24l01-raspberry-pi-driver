@@ -23,26 +23,26 @@
  */
 package com.m32dn.nrf24pi.impl;
 
-import com.m32dn.nrf24pi.Address;
-import com.m32dn.nrf24pi.TxPacket;
+import com.m32dn.nrf24pi.Nrf24Address;
+import com.m32dn.nrf24pi.Nrf24TxPacket;
 import java.nio.ByteBuffer;
 
 /**
  *
  * @author majo
  */
-class TxPacketImpl implements TxPacket {
+class TxPacketImpl implements Nrf24TxPacket {
 
-    private final Address address;
+    private final Nrf24Address address;
     private final ByteBuffer payload;
 
-    public TxPacketImpl(Address address, ByteBuffer payload) {
+    public TxPacketImpl(Nrf24Address address, ByteBuffer payload) {
         this.address = address;
         this.payload = payload;
     }
 
     @Override
-    public Address getTXAddress() {
+    public Nrf24Address getTXAddress() {
         return address;
     }
 
